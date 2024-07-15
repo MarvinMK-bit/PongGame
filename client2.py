@@ -23,7 +23,7 @@ ball_diameter = 20
 data_size = 4096
 
 # FPS speed for the game clock
-game_speed = 30
+game_speed = 300
 
 
 class PongDTO:
@@ -206,6 +206,7 @@ while run:
             run = False
         # Get the list of keys pressed
         keys = pygame.key.get_pressed()
+        print(keys)
         # Break the loop if player has escaped the game
         if keys[pygame.K_ESCAPE]:
             run = False

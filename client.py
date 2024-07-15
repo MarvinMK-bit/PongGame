@@ -16,14 +16,14 @@ ball_start_velocity_x = 3
 ball_start_velocity_y = 1
 bat_width = 20
 bat_height = 100
-bat_movement_speed = 20
-ball_diameter = 20
+bat_movement_speed = 30
+ball_diameter = 60
 
 # Packet size for sending and receiving between server and clients
 data_size = 4096
 
 # FPS speed for the game clock
-game_speed = 30
+game_speed = 20
 
 
 class PongDTO:
@@ -73,10 +73,26 @@ class Bat:
         """This is a data transfer object containing the variables that will be passed between server and clients."""
         self.points += 1
 
+#
+# class Ball:
+#     """This class facilitates managing the movement of the ball on screen."""
+#
+#     def __init__(self, x, y, color):
+#         """Constructor to initiate the ball"""
+#         self.x = x
+#         self.y = y
+#         self.color = color
+#         self.width = ball_diameter
+#         self.velocity_x = ball_start_velocity_x
+#         self.velocity_y = ball_start_velocity_y
+#         self.direction_x = random.choice(('positive', 'negative'))
+#         self.direction_y = random.choice(('positive', 'negative'))
+#
+#     def draw(self, window):
+#         """This method draws the ball on screen. It takes the surface as argument."""
+#         pygame.draw.circle(window, self.color, (self.x, self.y), (ball_diameter / 2))
 
 class Ball:
-    """This class facilitates managing the movement of the ball on screen."""
-
     def __init__(self, x, y, color):
         """Constructor to initiate the ball"""
         self.x = x
@@ -87,10 +103,12 @@ class Ball:
         self.velocity_y = ball_start_velocity_y
         self.direction_x = random.choice(('positive', 'negative'))
         self.direction_y = random.choice(('positive', 'negative'))
+        self.image = pygame.image.load('bitcoin.png')  # Load the Bitcoin logo image
+        self.image = pygame.transform.scale(self.image, (ball_diameter, ball_diameter))  # Scale the image to fit the ball diameter
 
     def draw(self, window):
         """This method draws the ball on screen. It takes the surface as argument."""
-        pygame.draw.circle(window, self.color, (self.x, self.y), (ball_diameter / 2))
+        window.blit(self.image, (self.x - self.width // 2, self.y - self.width // 2))  # Draw the Bitcoin logo centered at (self.x, self.y)
 
 
 def update_bat_ball(dto):
@@ -129,11 +147,12 @@ import time
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 # Parse the ngrok URL
-ngrok_url = "0.tcp.in.ngrok.io"
-ngrok_port = 15083  # This is the port ngrok provided, not your local port
-
-# Use the ngrok address and port
-addr = (ngrok_url, ngrok_port)
+# ngrok_url = "0.tcp.in.ngrok.io"
+# # ngrok_port = 15083  # This is the port ngrok provided, not your local port
+#
+# # Use the ngrok address and port
+# addr = (ngrok_url, ngrok_port)
+addr = ("localhost" , 5000)
 
 # Set a timeout for receiving data
 client.settimeout(10)  # 10 seconds timeout
