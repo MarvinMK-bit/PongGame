@@ -362,14 +362,14 @@ def threaded_client(conn, game_id, player_id):
 #     start_new_thread(threaded_client, (conn, game_id, player_id))
 import socket
 from _thread import start_new_thread
+import pickle
 
-# Use localhost for local testing
-server = "localhost"  # or "127.0.0.1"
-port = 5555
+# Use localhost for both local testing and ngrok
+server = "localhost"
+port = 5000
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# Add a print statement to show we're trying to bind
 print(f"Attempting to bind to {server}:{port}")
 
 try:
@@ -378,30 +378,60 @@ except Exception as e:
     print(f"Binding failed: {e}")
     exit()
 
-# If binding succeeds, we'll reach this point
 print(f"Successfully bound to {server}:{port}")
 
-try:
-    s.listen()
-    print("Waiting for a connection, Server Started")
-except Exception as e:
-    print(f"Listen failed: {e}")
-    exit()
+s.listen()
+print("Waiting for a connection, Server Started")
 
 game_ids = []
+
+
+def get_game_player_id():
+    game_id = len(game_ids)
+    player_id = 1 if game_id % 2 == 0 else 2
+    if len(game_ids) == 0:
+        game = Game()
+        game.game_id = game_id
+        game.player_ids.append(player_id)
+        game.initiate_dto()
+        if player_id == 1:
+            game_ids.append(game_id)
+    return game_id, player_id
+
+
+class DTO:
+    def __init__(self, game_id, player_id):
+        self.game_id = game_id
+        self.player_id = player_id
+
+
+def threaded_client(conn, game_id, player_id):
+    dto = DTO(game_id, player_id)
+    conn.send(pickle.dumps(dto))
+
+    while True:
+        try:
+            # Add your game logic here
+            pass
+        except:
+            break
+
+    print(f"Lost connection to player {player_id} in game {game_id}")
+    conn.close()
+
 
 while True:
     try:
         conn, addr = s.accept()
         print("Connected to:", addr)
-
         game_id, player_id = get_game_player_id()
         print("Game id -", game_id, ", Player id -", player_id)
         print('Game length -', len(game_ids))
-
         start_new_thread(threaded_client, (conn, game_id, player_id))
+    except socket.error as e:
+        print(f"Socket error in main loop: {e}")
+        # Decide whether to break or continue based on the error
     except Exception as e:
-        print(f"Error in main loop: {e}")
-        break
-
+        print(f"Unexpected error in main loop: {e}")
+        # Log the error and decide whether to break or continue
 s.close()

@@ -109,20 +109,67 @@ def update_bat_ball(dto):
     ball.x = dto.ball_x
     ball.y = dto.ball_y
 
+#
+# # Create a socket for the server and client connection
+# client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# # Server IP is where the server python file is running and listening for connections
+# server = "tcp://0.tcp.in.ngrok.io:15083"
+# # Port is where server is listening.
+# port = 5000
+# addr = (server, port)
+#
+# # Initiate client and server connection
+# client.connect(addr)
+
+import socket
+import pickle
+import time
 
 # Create a socket for the server and client connection
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# Server IP is where the server python file is running and listening for connections
-server = "192.168.1.170"
-# Port is where server is listening.
-port = 5555
-addr = (server, port)
+
+# Parse the ngrok URL
+ngrok_url = "0.tcp.in.ngrok.io"
+ngrok_port = 15083  # This is the port ngrok provided, not your local port
+
+# Use the ngrok address and port
+addr = (ngrok_url, ngrok_port)
+
+# Set a timeout for receiving data
+client.settimeout(10)  # 10 seconds timeout
 
 # Initiate client and server connection
-client.connect(addr)
+try:
+    client.connect(addr)
+    print("Connected to server successfully!")
+except Exception as e:
+    print(f"Failed to connect: {e}")
+    exit()
+
 # Receive the data transfer object from server for first time
-receive_dto = pickle.loads(client.recv(data_size))
-print("You are player ", receive_dto.player_id)
+try:
+    print("Waiting for data from server...")
+    data = client.recv(data_size)
+    if not data:
+        print("No data received from server.")
+        client.close()
+        exit()
+
+    print(f"Received {len(data)} bytes of data")
+    receive_dto = pickle.loads(data)
+    print("You are player", receive_dto.player_id)
+except socket.timeout:
+    print("Timeout: No data received from server within the allocated time.")
+    client.close()
+    exit()
+except EOFError:
+    print("EOFError: Received incomplete data from server.")
+    client.close()
+    exit()
+except Exception as e:
+    print(f"An error occurred while receiving data: {e}")
+    client.close()
+    exit()
 
 # Retrieve the player id from the DTO
 player_id = receive_dto.player_id
