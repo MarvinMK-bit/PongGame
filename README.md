@@ -1,6 +1,6 @@
 requirements:
-python
-pygame
+python,
+pygame,
 the same Ipv4 address for both players if they are on different machines.
 
 Player 1 should run server.py, then client.py.
