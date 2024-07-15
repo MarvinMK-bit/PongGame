@@ -326,112 +326,37 @@ def threaded_client(conn, game_id, player_id):
     # Release the connection with this client
     conn.close()
 
-#
-# # Server IP is where the server python file will be running and accepting connections
-# server = "197.239.9.28"
-# # Port is where server will keep listening. Better to use a higher port as that is usually not used
-# port = 5555
-#
-# # Initiate socket for the connection
-# s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-#
-# # Bind the server and port with socket
-# try:
-#     s.bind((server, port))
-# except socket.error as e:
-#     str(e)
-#
-# # Start listening for client connections
-# s.listen()
-# print("Waiting for a connection, Server Started")
-#
-# # Initialize the blank game queue
-# game_ids = []
-# # Start loop for accepting incoming connections from clients (i.e. players) to this server
-# while True:
-#     # Accept client connection
-#     conn, addr = s.accept()
-#     print("Connected to:", addr)
-#
-#     # Get the game id and player id
-#     game_id, player_id = get_game_player_id()
-#     print("Game id -", game_id, ", Player id -", player_id)
-#     print('Game length -', len(game_ids))
-#
-#     # Start new threaded connection with client and call the method to handle the thread.
-#     start_new_thread(threaded_client, (conn, game_id, player_id))
-import socket
-from _thread import start_new_thread
-import pickle
 
-# Use localhost for both local testing and ngrok
+# Server IP is where the server python file will be running and accepting connections
 server = "localhost"
+# Port is where server will keep listening. Better to use a higher port as that is usually not used
 port = 5000
 
+# Initiate socket for the connection
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-print(f"Attempting to bind to {server}:{port}")
-
+# Bind the server and port with socket
 try:
     s.bind((server, port))
-except Exception as e:
-    print(f"Binding failed: {e}")
-    exit()
+except socket.error as e:
+    str(e)
 
-print(f"Successfully bound to {server}:{port}")
-
+# Start listening for client connections
 s.listen()
 print("Waiting for a connection, Server Started")
 
+# Initialize the blank game queue
 game_ids = []
-
-
-def get_game_player_id():
-    game_id = len(game_ids)
-    player_id = 1 if game_id % 2 == 0 else 2
-    if len(game_ids) == 0:
-        game = Game()
-        game.game_id = game_id
-        game.player_ids.append(player_id)
-        game.initiate_dto()
-        if player_id == 1:
-            game_ids.append(game_id)
-    return game_id, player_id
-
-
-class DTO:
-    def __init__(self, game_id, player_id):
-        self.game_id = game_id
-        self.player_id = player_id
-
-
-def threaded_client(conn, game_id, player_id):
-    dto = DTO(game_id, player_id)
-    conn.send(pickle.dumps(dto))
-
-    while True:
-        try:
-            # Add your game logic here
-            pass
-        except:
-            break
-
-    print(f"Lost connection to player {player_id} in game {game_id}")
-    conn.close()
-
-
+# Start loop for accepting incoming connections from clients (i.e. players) to this server
 while True:
-    try:
-        conn, addr = s.accept()
-        print("Connected to:", addr)
-        game_id, player_id = get_game_player_id()
-        print("Game id -", game_id, ", Player id -", player_id)
-        print('Game length -', len(game_ids))
-        start_new_thread(threaded_client, (conn, game_id, player_id))
-    except socket.error as e:
-        print(f"Socket error in main loop: {e}")
-        # Decide whether to break or continue based on the error
-    except Exception as e:
-        print(f"Unexpected error in main loop: {e}")
-        # Log the error and decide whether to break or continue
-s.close()
+    # Accept client connection
+    conn, addr = s.accept()
+    print("Connected to:", addr)
+
+    # Get the game id and player id
+    game_id, player_id = get_game_player_id()
+    print("Game id -", game_id, ", Player id -", player_id)
+    print('Game length -', len(game_ids))
+
+    # Start new threaded connection with client and call the method to handle the thread.
+    start_new_thread(threaded_client, (conn, game_id, player_id))

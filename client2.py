@@ -70,7 +70,7 @@ class Bat:
             self.y += bat_movement_speed
 
     def add_point(self):
-        """This is a data transfer object containing the variables that will be passed between server and clients."""
+        """This method increases the points of the player."""
         self.points += 1
 
 
@@ -109,21 +109,8 @@ def update_bat_ball(dto):
     ball.x = dto.ball_x
     ball.y = dto.ball_y
 
-#
-# # Create a socket for the server and client connection
-# client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-# # Server IP is where the server python file is running and listening for connections
-# server = "tcp://0.tcp.in.ngrok.io:15083"
-# # Port is where server is listening.
-# port = 5000
-# addr = (server, port)
-#
-# # Initiate client and server connection
-# client.connect(addr)
 
 import socket
-
-import time
 
 # Create a socket for the server and client connection
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -158,10 +145,7 @@ try:
 
     print(f"Received {len(data)} bytes of data")
 
-    print("here")
     receive_dto = pickle.loads(data)
-    print(" here again")
-
 
     print("You are player", receive_dto.player_id)
 except socket.timeout:
@@ -243,7 +227,7 @@ while run:
     try:
         # Send the DTO to server
         client.sendall(pickle.dumps(receive_dto))
-        # Receive the DTO from serve__main__r
+        # Receive the DTO from server
         receive_dto = pickle.loads(client.recv(data_size))
     # Break loop for any exception
     except Exception as e:
@@ -259,3 +243,8 @@ while run:
     pygame.display.set_caption(
         f'Ping-Pong Your score (Green):{receive_dto.points[player_id]},'
         f' Opponent (Orange):{receive_dto.points[opponent_id]}')
+
+# Close the client connection
+client.close()
+# Quit the game
+pygame.quit()
