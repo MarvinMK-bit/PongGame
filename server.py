@@ -330,7 +330,7 @@ def threaded_client(conn, game_id, player_id):
 # Server IP is where the server python file will be running and accepting connections
 server = "localhost"
 # Port is where server will keep listening. Better to use a higher port as that is usually not used
-port = 5000
+port = 5500
 
 # Initiate socket for the connection
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
