@@ -2,7 +2,8 @@ import pickle
 import random
 import socket
 import pygame
-
+import os
+import sys
 # Game related global variables
 window_width = 700
 window_height = 700
@@ -24,6 +25,19 @@ data_size = 4096
 
 # FPS speed for the game clock
 game_speed = 20
+
+
+# Function to get the path to the bundled resources
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores the path in _MEIPASS
+        base_path = sys._MEIPASS
+    except AttributeError:
+        # In development mode, use the current directory
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 
 class PongDTO:
@@ -103,7 +117,7 @@ class Ball:
         self.velocity_y = ball_start_velocity_y
         self.direction_x = random.choice(('positive', 'negative'))
         self.direction_y = random.choice(('positive', 'negative'))
-        self.image = pygame.image.load('bitcoin.png')  # Load the Bitcoin logo image
+        self.image =  pygame.image.load(resource_path('bitcoin.png'))
         self.image = pygame.transform.scale(self.image, (ball_diameter, ball_diameter))  # Scale the image to fit the ball diameter
 
     def draw(self, window):
