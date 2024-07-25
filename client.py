@@ -146,13 +146,7 @@ import time
 # Create a socket for the server and client connection
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
-# Parse the ngrok URL
-# ngrok_url = "0.tcp.in.ngrok.io"
-# # ngrok_port = 15083  # This is the port ngrok provided, not your local port
-#
-# # Use the ngrok address and port
-# addr = (ngrok_url, ngrok_port)
-addr = ("localhost" , 5000)
+addr = ("45.92.8.242" , 5500)
 
 # Set a timeout for receiving data
 client.settimeout(10)  # 10 seconds timeout
